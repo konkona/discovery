@@ -574,6 +574,13 @@ func (d *Discovery) polls(ctx context.Context) (apps map[string]*InstancesInfo, 
 
 func (d *Discovery) broadcast(apps map[string]*InstancesInfo) {
 	for appID, v := range apps {
+		if v == nil {
+			d.mutex.RLock()
+			delete(d.apps, appID)
+			d.mutex.RUnlock()
+			continue
+		}
+
 		var count int
 		for zone, ins := range v.Instances {
 			if len(ins) == 0 {
